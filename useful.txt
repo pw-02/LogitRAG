@@ -1,3 +1,4 @@
 hf download meta-llama/Meta-Llama-3-8B-Instruct --local-dir llama3
 hf download intfloat/e5-base-v2 --local-dir e5-base-v2
 
+hf download meta-llama/Meta-Llama-3.1-8B-Instruct --local-dir Llama-3.1-8B-Instruct

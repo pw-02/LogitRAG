@@ -1,7 +1,7 @@
 # ----Global Paths----
 # Paths to retrieval models
 model2path:
-  e5: intfloat/e5-base-v2
+  e5: models/intfloat/e5-base-v2
   bge: BAAI/bge-base-en-v1.5
   bge-zh: BAAI/bge-large-zh-v1.5
   jina: jinaai/jina-embeddings-v2-base-en
@@ -11,7 +11,7 @@ model2path:
   llama2-7B: meta-llama/Llama-2-7b-hf
   llama2-7B-chat: meta-llama/Llama-2-7b-chat-hf
   selfrag-llama2-7B: selfrag/selfrag-llama2-7b
-  llama3-8B-instruct: meta-llama/Llama-2-8b-instruct-hf
+  llama3-8B-instruct: models/meta-llama/Llama-3-8B-Instruct
   phi-3: microsoft/phi-3-mini-4k-instruct
   qwen-14B: Qwen/Qwen1.5-14B-Chat
   qwen2-7B-instruct: Qwen/Qwen2-7B-Instruct
@@ -22,7 +22,7 @@ model2path:
   bge-m3: BAAI/bge-m3
   glm-4-9b-chat: THUDM/glm-4-9b-chat
   qwen2.5-7B-instruct: Qwen/Qwen2.5-7B-Instruct
-  llama3.1-8B-instruct: meta-llama/Llama-3.1-8B-Instruct
+  llama3.1-8B-instruct: models/meta-llama/Llama-3.1-8B-Instruct
   qwen2-vl-2B: Qwen/Qwen2-VL-2B-Instruct
   qwen2-vl-7B: Qwen/Qwen2-VL-7B-Instruct
   internvl2-2B: OpenGVLab/InternVL2-2B
@@ -46,7 +46,7 @@ model2pooling:
 
 # Indexes path for retrieval models
 method2index:
-  e5: ~
+  e5: data/indexes/wiki18_100w_e5/wiki18_100w_e5_index
   bm25: ~
   contriever: ~
   bge: ~
@@ -65,14 +65,14 @@ save_intermediate_data: True
 seed: 2024
 
 # Directory paths for data and outputs
-data_dir: "datasets/"
+data_dir: "data/"
 #save_dir: "/data00/jiajie_jin/test_project/output"
 save_dir: "result/"
 
 # ----Retrieval Settings----
 retrieval_method: "e5" # name or path of the retrieval model
 index_path: ~ # Set automatically if not provided
-corpus_path: ~
+corpus_path: data/wiki_corpus/wiki18_100w.jsonl
 retrieval_pooling_method: ~
 
 retrieval_topk: 5
