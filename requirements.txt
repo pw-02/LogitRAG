@@ -21,3 +21,4 @@ gradio>=5.0.0
 rouge-chinese
 jieba
 termcolor
+faiss-cpu
