@@ -34,7 +34,7 @@ dataset_name: "nq" # name of the dataset in data_dir
 split: [ "test" ]  # dataset split to load (e.g. train,dev,test)
 
 # Sampling configurations for testing
-test_sample_num: ~  # number of samples to test (only work in dev/test split), if None, test all samples
+test_sample_num: 10  # number of samples to test (only work in dev/test split), if None, test all samples
 random_sample: False # whether to randomly sample the test samples
 
 # Seed for reproducibility
