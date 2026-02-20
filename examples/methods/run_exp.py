@@ -20,6 +20,8 @@ def naive(args):
 
     result = pipeline.run(test_data)
 
+    print(result)
+
 
 def zero_shot(args):
     save_note = "zero-shot"
