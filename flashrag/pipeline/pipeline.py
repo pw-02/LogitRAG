@@ -43,8 +43,6 @@ class BasicPipeline:
         return dataset, eval_result
     
     
-
-
 class SequentialPipeline(BasicPipeline):
     def __init__(self, config, prompt_template=None, retriever=None, generator=None):
         """
@@ -156,6 +154,9 @@ class SequentialPipeline(BasicPipeline):
         metrics["generation_time(s)"] = end_generation_time - start_generation_time
         dataset, eval_result = self.evaluate(dataset, do_eval=do_eval, pred_process_fun=pred_process_fun)
         metrics.update(eval_result)
+
+        end_time = time.perf_counter()
+        metrics["total_time(s)"] = end_time - start_time
 
         if self.save_dir is not None:
             #save metrics file to csv file in save_dir
