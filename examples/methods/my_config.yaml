@@ -20,7 +20,7 @@ model2pooling:
 
 # Indexes path for retrieval models
 method2index:
-  e5: data/indexes/wiki18_100w_e5/wiki18_100w_e5_index
+  e5: data/indexes/wiki_dpr_100w/e5_flat_inner.index
   bm25: ~
   contriever: ~
 
