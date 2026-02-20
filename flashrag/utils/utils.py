@@ -19,6 +19,7 @@ def get_dataset(config):
         exist_flag = 0
         for file_postfix in SUPPORT_FILES:
             split_path = os.path.join(dataset_path, f"{split}.{file_postfix}")
+            print(split_path)
             if not os.path.exists(split_path):
                 continue
             else:
@@ -34,7 +35,7 @@ def get_dataset(config):
             )
         else:
             split_dict[split] = Dataset(config, split_path)
-
+    print(f"Dataset loaded: { {split: len(split_dict[split]) for split in all_split} }")
     return split_dict
 
 
