@@ -374,6 +374,7 @@ class DenseRetriever(BaseTextRetriever):
             co.useFloat16 = True
             co.shard = True
             self.index = faiss.index_cpu_to_all_gpus(self.index, co=co)
+        print(f"Successfully loaded faiss index from {self.index_path}!")
 
     def update_additional_setting(self):
         self.query_max_length = self._config["retrieval_query_max_length"]
@@ -448,6 +449,7 @@ class DenseRetriever(BaseTextRetriever):
             return results
 
     def _batch_search(self, query: List[str], num: int = None, return_score=False):
+
         if isinstance(query, str):
             query = [query]
         if num is None:
@@ -456,13 +458,21 @@ class DenseRetriever(BaseTextRetriever):
 
         results = []
         scores = []
+
         emb = self.encoder.encode(query, batch_size=batch_size, is_query=True)
+
+        print("Start searching...")
+        t_now = time.perf_counter()
         scores, idxs = self.index.search(emb, k=num)
+        print(f"Search time: {time.perf_counter() - t_now:.2f}s")
         scores = scores.tolist()
         idxs = idxs.tolist()
 
         flat_idxs = [idx for sublist in idxs for idx in sublist]
+        print("Start loading docs...")
+        t_now = time.perf_counter()
         results = load_docs(self.corpus, flat_idxs)
+        print(f"Loading docs time: {time.perf_counter() - t_now:.2f}s")
         results = [results[i * num : (i + 1) * num] for i in range(len(idxs))]
 
         if return_score:
