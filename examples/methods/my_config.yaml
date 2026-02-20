@@ -26,7 +26,7 @@ method2index:
 
 # ------------------------------------------------Environment Settings------------------------------------------------#
 # Directory paths for data and outputs
-data_dir: "/home/pwatters/project/LogitRAG/data/datasets/qa/nq/"
+data_dir: "/home/pwatters/project/LogitRAG/data/datasets/qa"
 save_dir: "/home/pwatters/project/LogitRAG/output/"
 
 gpu_id: "0"
