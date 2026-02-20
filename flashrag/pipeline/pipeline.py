@@ -1,8 +1,11 @@
+import time
+
 from flashrag.evaluator import Evaluator
 from flashrag.dataset.utils import split_dataset, merge_dataset
 from flashrag.utils import get_retriever, get_generator, get_refiner, get_judger
 from flashrag.prompt import PromptTemplate
-
+import os
+import pandas as pd
 
 class BasicPipeline:
     """Base object of all pipelines. A pipeline includes the overall process of RAG.
@@ -25,7 +28,7 @@ class BasicPipeline:
 
     def evaluate(self, dataset, do_eval=True, pred_process_fun=None):
         """The evaluation process after finishing overall generation"""
-
+        eval_result = {}
         if pred_process_fun is not None:
             dataset = pred_process_fun(dataset)
 
@@ -37,8 +40,7 @@ class BasicPipeline:
         # save retrieval cache
         if self.save_retrieval_cache:
             self.retriever._save_cache()
-
-        return dataset
+        return dataset, eval_result
     
     
 
@@ -69,6 +71,11 @@ class SequentialPipeline(BasicPipeline):
             self.refiner = get_refiner(config, self.retriever, self.generator)
         else:
             self.refiner = None
+        
+        if config["save_dir"] is not None:
+            self.save_dir = config["save_dir"]
+        else:
+            self.save_dir = None
 
     def naive_run(self, dataset, do_eval=True, pred_process_fun=None):
         # direct generation without RAG
@@ -78,14 +85,26 @@ class SequentialPipeline(BasicPipeline):
         pred_answer_list = self.generator.generate(input_prompts)
         dataset.update_output("pred", pred_answer_list)
 
-        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_fun=pred_process_fun)
+        dataset, eval_result = self.evaluate(dataset, do_eval=do_eval, pred_process_fun=pred_process_fun)
+
         return dataset
 
     def run(self, dataset, do_eval=True, pred_process_fun=None):
+
+        metrics = {}
+        start_time = time.perf_counter()
         input_query = dataset.question
+
+        print(f"Starting retrieval for {len(input_query)} queries..")
+        start_retrieval_time = time.perf_counter()
         retrieval_results = self.retriever.batch_search(input_query)
+        end_retrieval_time = time.perf_counter()
+        metrics["retrieval_time(s)"] = end_retrieval_time - start_retrieval_time
+        
         dataset.update_output("retrieval_result", retrieval_results)
 
+        print(f"Starting to prepare input prompts for generator..")
+        start_prompt_time = time.perf_counter()
         if self.refiner:
             input_prompt_flag = self.refiner.input_prompt_flag
             if "llmlingua" in self.refiner.name and input_prompt_flag:
@@ -124,12 +143,32 @@ class SequentialPipeline(BasicPipeline):
         # delete used refiner to release memory
         if self.refiner:
             del self.refiner
+        
+        end_retrieval_time = time.perf_counter()
+        metrics["prompt_time(s)"] = end_retrieval_time - start_prompt_time
+
+        print(f"Starting generation..")
+        start_generation_time = time.perf_counter()
         pred_answer_list = self.generator.generate(input_prompts)
         dataset.update_output("pred", pred_answer_list)
 
-        dataset = self.evaluate(dataset, do_eval=do_eval, pred_process_fun=pred_process_fun)
+        end_generation_time = time.perf_counter()
+        metrics["generation_time(s)"] = end_generation_time - start_generation_time
+        dataset, eval_result = self.evaluate(dataset, do_eval=do_eval, pred_process_fun=pred_process_fun)
+        metrics.update(eval_result)
 
-        return dataset
+        if self.save_dir is not None:
+            #save metrics file to csv file in save_dir
+     
+            metrics_file = os.path.join(self.save_dir, "metrics.csv")
+            if os.path.exists(metrics_file):
+                df = pd.read_csv(metrics_file)
+                df = df.append(metrics, ignore_index=True)
+            else:
+                df = pd.DataFrame([metrics])
+            df.to_csv(metrics_file, index=False)
+
+        return dataset, eval_result
 
 
 class ConditionalPipeline(BasicPipeline):

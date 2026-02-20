@@ -19,8 +19,7 @@ def naive(args):
     pipeline = SequentialPipeline(config)
 
     result = pipeline.run(test_data)
-
-    print(result)
+    
 
 
 def zero_shot(args):
